@@ -22,6 +22,17 @@ namespace LicenseManServer
             return encryptedBytes;
         }
 
+        public static byte[] Encrypt(string publicKey, byte[] data)
+        {
+            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
+
+            rsaProvider.ImportCspBlob(Convert.FromBase64String(publicKey));
+
+            byte[] encryptedBytes = rsaProvider.Encrypt(data, false);
+
+            return encryptedBytes;
+        }
+
         public static string Decrypt(string privateKey, byte[] encryptedBytes)
         {
             RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();

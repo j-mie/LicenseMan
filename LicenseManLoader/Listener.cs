@@ -35,21 +35,31 @@ namespace LicenseManLoader
             {
                 case NetIncomingMessageType.Data:
                     var header = inc.ReadByte();
-                    
-                    if(header == (byte)5)
+
+                    if (header == (byte)5)
                     {
                         string DisconnectReason = inc.ReadString();
                         MessageBox.Show(DisconnectReason);
                         Environment.Exit(-1);
-                    } else
-                    if(header == (byte)11)
+                    }
+                    else if (header == (byte)11)
                     {
                         string publickey = inc.ReadString();
                     }
+                    else if (header == (byte)20)
+                    {
+                        var length = inc.ReadInt32();
 
-                    var bytes = new byte[inc.LengthBytes];
-                    inc.ReadBytes(bytes, 0, inc.LengthBytes);
-                    Console.WriteLine("Got a binary of {0} bytes", bytes.Length);
+                        var index = inc.ReadInt32();
+                        var max = inc.ReadInt32();
+
+                        Console.WriteLine("Got {0} out of {1}", index, max);
+
+                        var bytes = new byte[length];
+                        inc.ReadBytes(bytes, 0, length);
+                        Console.WriteLine("Got a binary of {0} bytes", bytes.Length);
+                    }
+
                     break;
             }
         }

@@ -63,6 +63,24 @@ namespace LicenseManServer
             ClientConn.Disconnect(Message);
         }
 
+        internal void SendChunk(int index, int max, byte[] data, NetConnection ClientConn)
+        {
+            var c = Clients[ClientConn];
+
+            Logger.Debug(@"Sending Chunk {0} out of {1} to {2}:[{3}]", index, max, ClientConn.RemoteEndPoint.Address, c.Username);
+
+            data = Crypto.Encrypt(c.PublicKey, data);
+
+            NetOutgoingMessage msg = NetServer.CreateMessage();
+            msg.Write((byte)20);
+            msg.Write(data.Length);
+            msg.Write(index);
+            msg.Write(max);
+            msg.Write(data);
+
+            NetServer.SendMessage(msg, ClientConn, NetDeliveryMethod.ReliableOrdered);
+        }
+
         internal void HandleMsg(NetIncomingMessage inc)
         {
             switch (inc.MessageType)
@@ -155,11 +173,17 @@ namespace LicenseManServer
                     Logger.Info("Building new Klunk object for {0}:[{1}]", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
                     Klunk file = new Klunk(Config.DLLName);
-
                     var data = file.Split();
 
                     Logger.Info("Klunk size = {0}", data.Count());
 
+                    int i = 0;
+
+                    foreach(var chunk in data)
+                    {
+                        i++;
+                        SendChunk(i, data.Count(), chunk, inc.SenderConnection);
+                    }
                 }
             }
         }
