@@ -45,7 +45,7 @@ namespace LicenseManServer
         {
             Logger.Info("Starting LicenseManServer for: {0}", Config.ApplicationName);
 
-            Server = new Server(Config.ListenPort, Config.EnableUPnP);
+            Server = new Server(Config);
             Server.Listen();
         }
     }

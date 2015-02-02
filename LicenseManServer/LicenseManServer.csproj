@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Crypto.cs" />
     <Compile Include="LicenseManServer.cs" />

@@ -11,24 +11,26 @@ namespace LicenseManServer
     class Server
     {
         NetServer NetServer;
-        NetPeerConfiguration Config;
+        NetPeerConfiguration NetPeerConfig;
         Logger Logger;
+        Config Config;
 
-        Dictionary<NetConnection, string> Keys = new Dictionary<NetConnection, string>();
+        Dictionary<NetConnection, Client> Clients = new Dictionary<NetConnection, Client>();
 
-        internal Server(int Port, bool UPnP)
+        internal Server(Config Config)
         {
-            Logger = LogManager.GetLogger("Listener");
+            this.Logger = LogManager.GetLogger("Listener");
+            this.Config = Config;
 
-            Config = new NetPeerConfiguration("LicenseMan")
+            NetPeerConfig = new NetPeerConfiguration("LicenseMan")
             {
                 MaximumConnections = 1000,
                 ConnectionTimeout = 30,
-                Port = Port,
-                EnableUPnP = UPnP
+                Port = Config.ListenPort,
+                EnableUPnP = Config.EnableUPnP
             };
 
-            NetServer = new NetServer(this.Config);
+            NetServer = new NetServer(this.NetPeerConfig);
         }
 
         internal void Listen()
@@ -56,7 +58,26 @@ namespace LicenseManServer
                     if(type == (byte)10)
                     {
                         Logger.Debug("Got public key from: {0}", inc.SenderConnection.RemoteEndPoint.Address);
-                        Keys.Add(inc.SenderConnection, inc.ReadString());
+
+                        Client c = new Client();
+                        c.PublicKey = inc.ReadString();
+
+                        Clients.Add(inc.SenderConnection, c);
+                    } else if (type == (byte)11)
+                    {
+                        int usernameLength = inc.ReadInt32();
+                        int passwordLength = inc.ReadInt32();
+
+                        byte[] UsernameBytes = new byte[usernameLength];
+                        byte[] PasswordBytes = new byte[passwordLength];
+
+                        inc.ReadBytes(UsernameBytes, 5, usernameLength);
+                        inc.ReadBytes(PasswordBytes, 5 + usernameLength, passwordLength);
+
+                        var Username = Crypto.Decrypt(this.Config.PrivateKey, UsernameBytes);
+                        var Password = Crypto.Decrypt(this.Config.PrivateKey, PasswordBytes);
+
+                        Logger.Debug("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
                     }
                     break;
 

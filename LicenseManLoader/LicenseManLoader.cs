@@ -22,9 +22,12 @@ namespace LicenseManLoader
         string PublicKey;
         string PrivateKey;
 
+        string Username;
+        string Password;
+
         internal string ServerPublicKey;
 
-        internal LicenseManLoader(string publicKey, string privateKey)
+        internal LicenseManLoader(string publicKey, string privateKey, string username, string password)
         {
             NetPeerConfig = new NetPeerConfiguration("LicenseMan");
             NetClient = new NetClient(NetPeerConfig);
@@ -32,6 +35,9 @@ namespace LicenseManLoader
 
             this.PublicKey = publicKey;
             this.PrivateKey = privateKey;
+
+            this.Username = username;
+            this.Password = password;
 
             GetConfig();
             GetKey();
@@ -114,9 +120,19 @@ namespace LicenseManLoader
             NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
-        internal void GetUsernameAndPassword()
+        internal void SendUsernameAndPassword()
         {
+            NetOutgoingMessage msg = NetClient.CreateMessage();
+            var username = Crypto.Encrypt(ServerPublicKey, Username);
+            var password = Crypto.Encrypt(ServerPublicKey, Password);
 
+            msg.Write(11);
+            msg.Write((Int32)username.Length);
+            msg.Write((Int32)password.Length);
+            msg.Write(username);
+            msg.Write(password);
+            
+            NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
     }
 }

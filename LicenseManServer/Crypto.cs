@@ -5,10 +5,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LicenseManLoader
+namespace LicenseManServer
 {
     // Thanks to http://stackoverflow.com/a/18850104
-    class Crypto
+    internal class Crypto
     {
         public static byte[] Encrypt(string publicKey, string data)
         {

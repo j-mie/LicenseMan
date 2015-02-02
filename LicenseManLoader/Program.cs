@@ -38,7 +38,7 @@ namespace LicenseManLoader
             string publicKey = Convert.ToBase64String(rsaProvider.ExportCspBlob(false));
             string privateKey = Convert.ToBase64String(rsaProvider.ExportCspBlob(true));
 
-            LicenseManLoader Loader = new LicenseManLoader(publicKey, privateKey);
+            LicenseManLoader Loader = new LicenseManLoader(publicKey, privateKey, cm.Username, cm.Password);
 
             new Thread(() => {
                 Loader.Load();
@@ -46,6 +46,10 @@ namespace LicenseManLoader
 
 
             Loader.SendPublicKey();
+
+            Thread.Sleep(350);
+
+            Loader.SendUsernameAndPassword();
         }
     }
 }
