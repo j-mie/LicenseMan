@@ -58,6 +58,7 @@ namespace LicenseManLoader
                             HandleChunk(inc); 
                         break;
                         case (byte)PacketHeaders.Headers.AssemblySettings:
+                            HandleAssemblySettings(inc);
                         break;
                     }
                     break;
@@ -80,7 +81,6 @@ namespace LicenseManLoader
 
         private void HandleChunk(NetIncomingMessage inc)
         {
-            
             var length = inc.ReadInt32();
             var index = inc.ReadInt32();
             var max = inc.ReadInt32();

@@ -5,12 +5,12 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LicenseManLoader
+namespace LicenseManShared
 {
     // Thanks to http://stackoverflow.com/a/18850104
-    class Crypto
+    public class Crypto
     {
-        public static string Encrypt(string publicKey, string data)
+        public static string EncryptToString(string publicKey, string data)
         {
             RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
 
@@ -20,6 +20,40 @@ namespace LicenseManLoader
             byte[] encryptedBytes = rsaProvider.Encrypt(plainBytes, false);
 
             return Convert.ToBase64String(encryptedBytes);
+        }
+
+        public static byte[] EncryptToBytes(string publicKey, string data)
+        {
+            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
+
+            rsaProvider.ImportCspBlob(Convert.FromBase64String(publicKey));
+
+            byte[] plainBytes = Encoding.UTF8.GetBytes(data);
+            byte[] encryptedBytes = rsaProvider.Encrypt(plainBytes, false);
+
+            return encryptedBytes;
+        }
+
+        public static byte[] EncryptToBytes(string publicKey, byte[] data)
+        {
+            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
+
+            rsaProvider.ImportCspBlob(Convert.FromBase64String(publicKey));
+
+            byte[] encryptedBytes = rsaProvider.Encrypt(data, false);
+
+            return encryptedBytes;
+        }
+
+        public static byte[] DecryptToBytes(string privateKey, byte[] encryptedBytes)
+        {
+            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
+
+            rsaProvider.ImportCspBlob(Convert.FromBase64String(privateKey));
+
+            byte[] plainBytes = rsaProvider.Decrypt(encryptedBytes, false);
+
+            return plainBytes;
         }
 
         public static string DecryptToString(string privateKey, string data)
@@ -47,17 +81,6 @@ namespace LicenseManLoader
             string plainText = Encoding.UTF8.GetString(plainBytes, 0, plainBytes.Length);
 
             return plainText;
-        }
-
-        public static byte[] DecryptToBytes(string privateKey, byte[] encryptedBytes)
-        {
-            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
-
-            rsaProvider.ImportCspBlob(Convert.FromBase64String(privateKey));
-
-            byte[] plainBytes = rsaProvider.Decrypt(encryptedBytes, false);
-
-            return plainBytes;
         }
     }
 }

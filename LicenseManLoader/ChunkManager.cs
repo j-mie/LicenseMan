@@ -45,11 +45,11 @@ namespace LicenseManLoader
                 var asm = Assembly.Load(ms.ToArray());
                 Console.WriteLine(asm.GetName());
 
-                Type t  = asm.GetType("ExampleApp.Program");
-                var methodInfo = t.GetMethod("Main");
+                Type t  = asm.GetType(NamespaceClass);
+                var methodInfo = t.GetMethod(Method);
                 if (methodInfo == null) // the method doesn't exist
                 {
-                    // throw some exception
+                    throw new Exception("Invalid binary sent over the wire!");
                 }
 
                 var o = Activator.CreateInstance(t);

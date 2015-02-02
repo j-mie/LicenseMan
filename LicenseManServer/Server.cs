@@ -74,7 +74,7 @@ namespace LicenseManServer
 
             Logger.Debug(@"Sending Chunk {0} out of {1} to {2}:[{3}]", index, max, ClientConn.RemoteEndPoint.Address, c.Username);
 
-            data = Crypto.Encrypt(c.PublicKey, data);
+            data = Crypto.EncryptToBytes(c.PublicKey, data);
 
             NetOutgoingMessage msg = NetServer.CreateMessage();
             msg.Write((byte)PacketHeaders.Headers.Chunk);
@@ -145,8 +145,8 @@ namespace LicenseManServer
             byte[] UsernameBytes = Convert.FromBase64String(UsernameBase64);
             byte[] PasswordBytes = Convert.FromBase64String(PasswordBase64);
 
-            var Username = Crypto.Decrypt(this.Config.PrivateKey, UsernameBytes);
-            var Password = Crypto.Decrypt(this.Config.PrivateKey, PasswordBytes);
+            var Username = Crypto.DecryptToString(this.Config.PrivateKey, UsernameBytes);
+            var Password = Crypto.DecryptToString(this.Config.PrivateKey, PasswordBytes);
 
             Logger.Info("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
@@ -187,8 +187,8 @@ namespace LicenseManServer
                     int i = 0;
 
 
-                    var NamespaceClassname = Crypto.Encrypt(c.PublicKey, Config.NameSpaceClass);
-                    var Method = Crypto.Encrypt(c.PublicKey, Config.Method);
+                    var NamespaceClassname = Crypto.EncryptToString(c.PublicKey, Config.NameSpaceClass);
+                    var Method = Crypto.EncryptToString(c.PublicKey, Config.Method);
 
                     NetOutgoingMessage msg = NetServer.CreateMessage();
                     msg.Write((byte)PacketHeaders.Headers.AssemblySettings);

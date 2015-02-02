@@ -58,7 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChunkManager.cs" />
-    <Compile Include="Crypto.cs" />
     <Compile Include="LicenseManLoader.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="LoginForm.cs">

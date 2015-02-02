@@ -124,8 +124,8 @@ namespace LicenseManLoader
         internal void SendUsernameAndPassword()
         {
             NetOutgoingMessage msg = NetClient.CreateMessage();
-            var username = Crypto.Encrypt(ServerPublicKey, Username);
-            var password = Crypto.Encrypt(ServerPublicKey, Password);
+            var username = Crypto.EncryptToString(ServerPublicKey, Username);
+            var password = Crypto.EncryptToString(ServerPublicKey, Password);
 
             msg.Write((byte)PacketHeaders.Headers.Login);
 
