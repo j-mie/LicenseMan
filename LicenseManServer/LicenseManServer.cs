@@ -13,6 +13,7 @@ namespace LicenseManServer
     {
         private Config Config;
         private Logger Logger;
+        private Server Server;
 
         public LicenseManServer()
         {
@@ -36,6 +37,9 @@ namespace LicenseManServer
         public void Start()
         {
             Logger.Info("Starting LicenseManServer for: {0}", Config.ApplicationName);
+
+            Server = new Server(Config.ListenPort);
+            Server.Listen();
         }
     }
 }

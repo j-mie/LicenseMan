@@ -12,5 +12,6 @@ namespace LicenseManServer
     public class Config
     {
         public string ApplicationName = "";
+        public int ListenPort = 4560;
     }
 }
