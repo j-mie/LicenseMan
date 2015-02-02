@@ -6,13 +6,28 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace LicenseManLoader
 {
     class Program
     {
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+
         static void Main(string[] args)
         {
+            #if !DEBUG
+            var handle = GetConsoleWindow();
+            ShowWindow(handle, SW_HIDE);
+            #endif
+
             var cm = new Credential { Target = "LicenseMan" };
 
             if(args.Length >= 1)
@@ -40,16 +55,22 @@ namespace LicenseManLoader
 
             LicenseManLoader Loader = new LicenseManLoader(publicKey, privateKey, cm.Username, cm.Password);
 
-            new Thread(() => {
+            var Listener = new Thread(() =>
+            {
                 Loader.Load();
-            }).Start();
+            });
 
+            Listener.Start();
 
             Loader.SendPublicKey();
 
             Thread.Sleep(350);
 
             Loader.SendUsernameAndPassword();
+
+            Thread.Sleep(350);
+
+            Listener.Abort();
         }
     }
 }

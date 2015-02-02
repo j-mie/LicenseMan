@@ -49,6 +49,10 @@ namespace LicenseManServer
 
         internal void DisconnectWMsg(string Message, NetConnection ClientConn)
         {
+            var c = Clients[ClientConn];
+
+            Logger.Info(@"Disconnecting {0}:[{2}] with reason {1}", ClientConn.RemoteEndPoint.Address, Message, c.Username);
+
             NetOutgoingMessage msg = NetServer.CreateMessage();
             msg.Write((byte)5);
             msg.Write(Message);
@@ -81,11 +85,16 @@ namespace LicenseManServer
                     break;
 
                 case NetIncomingMessageType.DebugMessage:
-                case NetIncomingMessageType.ErrorMessage:
-                case NetIncomingMessageType.WarningMessage:
-                case NetIncomingMessageType.VerboseDebugMessage:
                     Logger.Debug(inc.ReadString());
                     break;
+                case NetIncomingMessageType.ErrorMessage:
+                    Logger.Error(inc.ReadString());
+                    break;
+                case NetIncomingMessageType.WarningMessage:
+                    Logger.Warn(inc.ReadString());
+                    break;
+                //case NetIncomingMessageType.VerboseDebugMessage:
+                    
             }
         }
 
@@ -103,9 +112,9 @@ namespace LicenseManServer
         {
             var Client = Clients[inc.SenderConnection];
 
-            inc.ReadInt32(); // Padding
+            inc.ReadInt32(); // Padding?!?
             string UsernameBase64 = inc.ReadString();
-            inc.ReadInt32(); // Padding
+            inc.ReadInt32(); // Padding?!?
             string PasswordBase64 = inc.ReadString();
 
             byte[] UsernameBytes = Convert.FromBase64String(UsernameBase64);
@@ -114,10 +123,12 @@ namespace LicenseManServer
             var Username = Crypto.Decrypt(this.Config.PrivateKey, UsernameBytes);
             var Password = Crypto.Decrypt(this.Config.PrivateKey, PasswordBytes);
 
-            Logger.Debug("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
+            Logger.Info("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
             var c = Client.Load(Username);
             c.PublicKey = Client.PublicKey;
+
+            Clients[inc.SenderConnection] = c;
 
             if (c.NewUser == true)
             {
@@ -126,7 +137,6 @@ namespace LicenseManServer
                 c.Save();
 
                 DisconnectWMsg("Account created. Please contact owner.", inc.SenderConnection);
-                Clients[inc.SenderConnection] = c;
             }
             else
             {
