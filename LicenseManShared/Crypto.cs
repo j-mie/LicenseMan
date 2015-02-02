@@ -7,9 +7,29 @@ using System.Threading.Tasks;
 
 namespace LicenseManShared
 {
-    // Thanks to http://stackoverflow.com/a/18850104
     public class Crypto
     {
+        #region PasswordHashing
+        //Thanks - https://github.com/Rohansi/RohBot
+        public static byte[] HashPassword(string password, byte[] salt)
+        {
+            if (salt == null || salt.Length != 16)
+                throw new Exception("bad salt");
+
+            var h = new Rfc2898DeriveBytes(password, salt, 1000);
+            return h.GetBytes(128);
+        }
+
+        private static RNGCryptoServiceProvider _random = new RNGCryptoServiceProvider();
+        public static byte[] GenerateSalt()
+        {
+            var salt = new byte[16];
+            _random.GetBytes(salt);
+            return salt;
+        }
+        #endregion
+        #region RSA Crypto
+        // Thanks - http://stackoverflow.com/a/18850104
         private static string ByteToString(byte[] data)
         {
             return Encoding.UTF8.GetString(data);
@@ -62,5 +82,6 @@ namespace LicenseManShared
             byte[] base64 = Convert.FromBase64String(data);
             return ByteToString(DecryptToBytes(privateKey, base64));
         }
+        #endregion
     }
 }

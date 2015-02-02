@@ -1,4 +1,5 @@
-﻿using LicenseManShared;
+﻿using CredentialManagement;
+using LicenseManShared;
 using Lidgren.Network;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,11 @@ namespace LicenseManLoader
                             break;
                         case (byte)PacketHeaders.Headers.Disconnect:
                             string DisconnectReason = inc.ReadString();
+                            //if (DisconnectReason == "Invalid Username or Password")
+                            //{
+                            //    var cm = new Credential { Target = "LicenseMan" };
+                            //    cm.Delete();
+                            //}
                             MessageBox.Show(DisconnectReason);
                             Environment.Exit(-1);
                             break;

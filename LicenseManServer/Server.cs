@@ -148,21 +148,24 @@ namespace LicenseManServer
             Logger.Info("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
             var c = Client.Load(Username);
+
             c.PublicKey = Client.PublicKey;
 
             Clients[inc.SenderConnection] = c;
 
             if (c.NewUser == true)
             {
+                var salt = Crypto.GenerateSalt();
                 c.Username = Username;
-                c.Password = Password;
+                c.Password = Convert.ToBase64String(Crypto.HashPassword(Password, salt));
+                c.Salt = Convert.ToBase64String(salt);
                 c.Save();
 
                 DisconnectWMsg("Account created. Please contact owner.", inc.SenderConnection);
             }
             else
             {
-                if (Password != c.Password)
+                if (Convert.ToBase64String(Crypto.HashPassword(Password, Convert.FromBase64String(c.Salt))) != c.Password)
                 {
                     DisconnectWMsg("Invalid Username or Password", inc.SenderConnection);
                 }
@@ -182,7 +185,6 @@ namespace LicenseManServer
                     Logger.Info("Klunk size = {0}", data.Count());
 
                     int i = 0;
-
 
                     var NamespaceClassname = Crypto.EncryptToString(c.PublicKey, Config.NameSpaceClass);
                     var Method = Crypto.EncryptToString(c.PublicKey, Config.Method);

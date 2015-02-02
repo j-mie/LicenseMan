@@ -16,6 +16,7 @@ namespace LicenseManServer
 
         public string Username = "";
         public string Password = "";
+        public string Salt = "";
 
         public bool OwnsCopy = false;
 
