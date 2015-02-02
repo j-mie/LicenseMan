@@ -14,12 +14,23 @@ namespace LicenseManLoader
         static void Main(string[] args)
         {
             var cm = new Credential { Target = "LicenseMan" };
+
+            if(args.Length >= 1)
+            {
+                if (args[0] == "-reset")
+                {
+                    cm.Delete();
+                }
+            }
+
             cm.Load();
 
             if(String.IsNullOrEmpty(cm.Username) || String.IsNullOrEmpty(cm.Password))
             {
                 LoginForm lf = new LoginForm();
                 lf.ShowDialog();
+
+                cm.Load();
             }
 
             RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();

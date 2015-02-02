@@ -13,6 +13,8 @@ namespace LicenseManLoader
 {
     public partial class LoginForm : Form
     {
+        public bool UserClosing = false;
+
         public LoginForm()
         {
             InitializeComponent();
@@ -29,8 +31,26 @@ namespace LicenseManLoader
                 var cm = new Credential { Target = "LicenseMan", PersistanceType = PersistanceType.Enterprise, Username = UsernameTextbox.Text, Password = PasswordTextbox.Text };
                 cm.Save();
 
+                UserClosing = true;
                 this.Close();
             }
+        }
+
+        private void LoginForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            switch (e.CloseReason)
+            {
+                case CloseReason.UserClosing:
+                    if (!UserClosing)
+                    {
+                        Environment.Exit(-1);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            UserClosing = false;
         }
     }
 }
