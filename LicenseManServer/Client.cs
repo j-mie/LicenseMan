@@ -12,6 +12,7 @@ namespace LicenseManServer
     class Client
     {
         internal bool NewUser = false;
+        internal bool Verified = false;
 
         public string Username = "";
         public string Password = "";
