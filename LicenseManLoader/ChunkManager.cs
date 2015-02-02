@@ -38,6 +38,17 @@ namespace LicenseManLoader
 
                 var asm = Assembly.Load(ms.ToArray());
                 Console.WriteLine(asm.GetName());
+
+                Type t  = asm.GetType("ExampleApp.Program");
+                var methodInfo = t.GetMethod("Main");
+                if (methodInfo == null) // the method doesn't exist
+                {
+                    // throw some exception
+                }
+
+                var o = Activator.CreateInstance(t);
+
+                var result = methodInfo.Invoke(o, new object[0]);
             }
         }
     } 

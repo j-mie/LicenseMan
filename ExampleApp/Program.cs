@@ -9,7 +9,7 @@ namespace ExampleApp
 {
     class Program
     {
-        static void Main(string[] args)
+        public void Main()
         {
             MessageBox.Show("Hello, loaded over a network!");
         }
