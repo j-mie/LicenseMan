@@ -15,9 +15,12 @@ namespace LicenseManServer
         public int ListenPort = 4560;
         public bool EnableUPnP = false;
 
+        public string FileName = "client.dll";
+        public string NameSpaceClass = "ExampleApp.Program";
+        public string Method = "Main";
+
+
         public string PrivateKey = "";
         public string PublicKey = "";
-
-        public string DLLName = "client.dll";
     }
 }

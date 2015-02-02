@@ -172,7 +172,7 @@ namespace LicenseManServer
 
                     Logger.Info("Building new Klunk object for {0}:[{1}]", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
-                    Klunk file = new Klunk(Config.DLLName);
+                    Klunk file = new Klunk(Config.FileName);
                     var data = file.Split();
 
                     Logger.Info("Klunk size = {0}", data.Count());
