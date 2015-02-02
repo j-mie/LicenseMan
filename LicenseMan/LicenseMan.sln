@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseManServer", "LicenseManServer\LicenseManServer.csproj", "{1852F92E-076E-4B8B-9AEF-ADC210A1DB26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseManClient", "LicenseManClient\LicenseManClient.csproj", "{D96D4D9D-D83E-49BF-A5EC-B8F174F10970}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseManBuilder", "LicenseManBuilder\LicenseManBuilder.csproj", "{58F5FDF8-3FE6-45C4-91C8-A21E12AF6ED8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1852F92E-076E-4B8B-9AEF-ADC210A1DB26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1852F92E-076E-4B8B-9AEF-ADC210A1DB26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1852F92E-076E-4B8B-9AEF-ADC210A1DB26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1852F92E-076E-4B8B-9AEF-ADC210A1DB26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D96D4D9D-D83E-49BF-A5EC-B8F174F10970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D96D4D9D-D83E-49BF-A5EC-B8F174F10970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D96D4D9D-D83E-49BF-A5EC-B8F174F10970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D96D4D9D-D83E-49BF-A5EC-B8F174F10970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F5FDF8-3FE6-45C4-91C8-A21E12AF6ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F5FDF8-3FE6-45C4-91C8-A21E12AF6ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F5FDF8-3FE6-45C4-91C8-A21E12AF6ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F5FDF8-3FE6-45C4-91C8-A21E12AF6ED8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
