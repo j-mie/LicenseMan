@@ -65,6 +65,8 @@ namespace LicenseManServer
                         Clients.Add(inc.SenderConnection, c);
                     } else if (type == (byte)11)
                     {
+                        var Client = Clients[inc.SenderConnection];
+
                         inc.ReadInt32(); // Padding
                         string UsernameBase64 = inc.ReadString();
                         inc.ReadInt32(); // Padding
@@ -77,6 +79,30 @@ namespace LicenseManServer
                         var Password = Crypto.Decrypt(this.Config.PrivateKey, PasswordBytes);
 
                         Logger.Debug("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
+
+                        var c = Client.Load(Username);
+                        c.PublicKey = Client.PublicKey;
+
+                        if(c.NewUser == true)
+                        {
+                            c.Username = Username;
+                            c.Password = Password;
+                            c.Save();
+
+                            inc.SenderConnection.Disconnect("Account created. Please contact owner.");
+                            Clients[inc.SenderConnection] = c;
+                        }
+                        else
+                        {
+                            if(Password != c.Password)
+                            {
+                                inc.SenderConnection.Disconnect("Invalid Username or Password");
+                            }
+                            else if (!c.OwnsCopy)
+                            {
+                                inc.SenderConnection.Disconnect("You do not own a copy of this software!");
+                            }
+                        }
                     }
                     break;
 
