@@ -61,8 +61,20 @@ namespace LicenseManLoader
 
         internal void DownloadAndRun()
         {
+            while(true)
+            {
+                if(NetClient.ConnectionStatus != NetConnectionStatus.Connected)
+                {
+                    Thread.Sleep(10);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
             NetOutgoingMessage msg = NetClient.CreateMessage();
-            msg.Data = new byte[42];
+            msg.Write((byte)10);
 
             NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }

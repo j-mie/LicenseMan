@@ -33,18 +33,9 @@ namespace LicenseManLoader
             switch (inc.MessageType)
             {
                 case NetIncomingMessageType.Data:
-                    Console.WriteLine(inc.ReadString());
-                    break;
-
-                case NetIncomingMessageType.StatusChanged:
-                    Console.WriteLine(inc.SenderConnection + " status changed. " + inc.SenderConnection.Status);
-                    break;
-
-                case NetIncomingMessageType.DebugMessage:
-                case NetIncomingMessageType.ErrorMessage:
-                case NetIncomingMessageType.WarningMessage:
-                case NetIncomingMessageType.VerboseDebugMessage:
-                    Console.WriteLine(inc.ReadString());
+                    var bytes = new byte[inc.LengthBytes];
+                    inc.ReadBytes(bytes, 0, inc.LengthBytes);
+                    Console.WriteLine("Got a binary of {0} bytes", bytes.Length);
                     break;
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Lidgren.Network;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,13 @@ namespace LicenseManServer
     {
         NetServer NetServer;
         NetPeerConfiguration Config;
+        Logger Logger;
+        NetEncryption Encryption;
 
         internal Server(int Port, bool UPnP)
         {
+            Logger = LogManager.GetLogger("Listener");
+
             Config = new NetPeerConfiguration("LicenseMan")
             {
                 MaximumConnections = 1000,
@@ -43,19 +48,24 @@ namespace LicenseManServer
         {
             switch (inc.MessageType)
             {
+
                 case NetIncomingMessageType.Data:
-                    Console.WriteLine(inc.ReadString());
+                    byte type = inc.ReadByte();
+                    if(type == (byte)10)
+                    {
+                        Logger.Debug("Bin request from: {0}", inc.SenderConnection.RemoteEndPoint.Address);
+                    }
                     break;
 
                 case NetIncomingMessageType.StatusChanged:
-                    Console.WriteLine(inc.SenderConnection + " status changed. " + inc.SenderConnection.Status);
+                    Logger.Debug("{0} status changed to: {1}", inc.SenderConnection.RemoteEndPoint.Address, inc.SenderConnection.Status);
                     break;
 
                 case NetIncomingMessageType.DebugMessage:
                 case NetIncomingMessageType.ErrorMessage:
                 case NetIncomingMessageType.WarningMessage:
                 case NetIncomingMessageType.VerboseDebugMessage:
-                    Console.WriteLine(inc.ReadString());
+                    Logger.Debug(inc.ReadString());
                     break;
             }
         }
