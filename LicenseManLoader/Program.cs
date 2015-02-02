@@ -10,6 +10,9 @@ namespace LicenseManLoader
     {
         static void Main(string[] args)
         {
+            LicenseManLoader Loader = new LicenseManLoader();
+
+            Loader.Load();
         }
     }
 }

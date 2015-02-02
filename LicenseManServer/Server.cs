@@ -11,8 +11,8 @@ namespace LicenseManServer
     {
         NetServer NetServer;
         NetPeerConfiguration Config;
- 
-        public Server(int Port)
+
+        internal Server(int Port)
         {
             Config = new NetPeerConfiguration("LicenseMan")
             {
@@ -25,7 +25,7 @@ namespace LicenseManServer
             NetServer = new NetServer(this.Config);
         }
 
-        public void Listen()
+        internal void Listen()
         {
             NetIncomingMessage Msg;
 
@@ -37,7 +37,7 @@ namespace LicenseManServer
             }
         }
 
-        private void HandleMsg(NetIncomingMessage inc)
+        internal void HandleMsg(NetIncomingMessage inc)
         {
             switch (inc.MessageType)
             {
