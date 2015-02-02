@@ -10,16 +10,16 @@ namespace LicenseManLoader
     // Thanks to http://stackoverflow.com/a/18850104
     class Crypto
     {
-        public static byte[] Encrypt(string publicKey, string data)
+        public static string Encrypt(string publicKey, string data)
         {
             RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
 
             rsaProvider.ImportCspBlob(Convert.FromBase64String(publicKey));
 
             byte[] plainBytes = Encoding.UTF8.GetBytes(data);
-            byte[] encryptedBytes = rsaProvider.Encrypt(plainBytes, true);
+            byte[] encryptedBytes = rsaProvider.Encrypt(plainBytes, false);
 
-            return encryptedBytes;
+            return Convert.ToBase64String(encryptedBytes);
         }
 
         public static string Decrypt(string privateKey, byte[] encryptedBytes)

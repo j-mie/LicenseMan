@@ -65,14 +65,13 @@ namespace LicenseManServer
                         Clients.Add(inc.SenderConnection, c);
                     } else if (type == (byte)11)
                     {
-                        int usernameLength = inc.ReadInt32();
-                        int passwordLength = inc.ReadInt32();
+                        inc.ReadInt32(); // Padding
+                        string UsernameBase64 = inc.ReadString();
+                        inc.ReadInt32(); // Padding
+                        string PasswordBase64 = inc.ReadString();
 
-                        byte[] UsernameBytes = new byte[usernameLength];
-                        byte[] PasswordBytes = new byte[passwordLength];
-
-                        inc.ReadBytes(UsernameBytes, 5, usernameLength);
-                        inc.ReadBytes(PasswordBytes, 5 + usernameLength, passwordLength);
+                        byte[] UsernameBytes = Convert.FromBase64String(UsernameBase64);
+                        byte[] PasswordBytes = Convert.FromBase64String(PasswordBase64);
 
                         var Username = Crypto.Decrypt(this.Config.PrivateKey, UsernameBytes);
                         var Password = Crypto.Decrypt(this.Config.PrivateKey, PasswordBytes);

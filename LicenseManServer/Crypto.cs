@@ -17,7 +17,7 @@ namespace LicenseManServer
             rsaProvider.ImportCspBlob(Convert.FromBase64String(publicKey));
 
             byte[] plainBytes = Encoding.UTF8.GetBytes(data);
-            byte[] encryptedBytes = rsaProvider.Encrypt(plainBytes, true);
+            byte[] encryptedBytes = rsaProvider.Encrypt(plainBytes, false);
 
             return encryptedBytes;
         }

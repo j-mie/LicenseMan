@@ -115,8 +115,8 @@ namespace LicenseManLoader
             }
 
             NetOutgoingMessage msg = NetClient.CreateMessage();
-            msg.Write(10);
-            msg.Write(Crypto.Encrypt(ServerPublicKey, PublicKey));
+            msg.Write((byte)10);
+            msg.Write(PublicKey);
             NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
 
@@ -126,10 +126,11 @@ namespace LicenseManLoader
             var username = Crypto.Encrypt(ServerPublicKey, Username);
             var password = Crypto.Encrypt(ServerPublicKey, Password);
 
-            msg.Write(11);
-            msg.Write((Int32)username.Length);
-            msg.Write((Int32)password.Length);
+            msg.Write((byte)11);
+
+            msg.Write(1);
             msg.Write(username);
+            msg.Write(2);
             msg.Write(password);
             
             NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
