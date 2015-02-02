@@ -22,7 +22,21 @@ namespace LicenseManLoader
             return Convert.ToBase64String(encryptedBytes);
         }
 
-        public static string Decrypt(string privateKey, byte[] encryptedBytes)
+        public static string DecryptToString(string privateKey, string data)
+        {
+            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
+
+            rsaProvider.ImportCspBlob(Convert.FromBase64String(privateKey));
+
+            byte[] encryptedBytes = Convert.FromBase64String(data);
+            byte[] plainBytes = rsaProvider.Decrypt(encryptedBytes, false);
+
+            string plainText = Encoding.UTF8.GetString(plainBytes, 0, plainBytes.Length);
+
+            return plainText;
+        }
+
+        public static string DecryptToString(string privateKey, byte[] encryptedBytes)
         {
             RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
 

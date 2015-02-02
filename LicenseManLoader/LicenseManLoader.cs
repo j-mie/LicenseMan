@@ -1,4 +1,5 @@
-﻿using Lidgren.Network;
+﻿using LicenseManShared;
+using Lidgren.Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -115,7 +116,7 @@ namespace LicenseManLoader
             }
 
             NetOutgoingMessage msg = NetClient.CreateMessage();
-            msg.Write((byte)10);
+            msg.Write((byte)PacketHeaders.Headers.PublicKey);
             msg.Write(PublicKey);
             NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
@@ -126,7 +127,7 @@ namespace LicenseManLoader
             var username = Crypto.Encrypt(ServerPublicKey, Username);
             var password = Crypto.Encrypt(ServerPublicKey, Password);
 
-            msg.Write((byte)11);
+            msg.Write((byte)PacketHeaders.Headers.Login);
 
             msg.Write(1);
             msg.Write(username);

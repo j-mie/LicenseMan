@@ -1,4 +1,5 @@
-﻿using Lidgren.Network;
+﻿using LicenseManShared;
+using Lidgren.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,10 @@ namespace LicenseManLoader
     {
         NetClient Client;
         string PrivateKey;
+
+        string NamespaceClass;
+        string Method;
+
         internal Listener(NetClient client, string PrivateKey)
         {
             this.Client = client;
@@ -30,7 +35,7 @@ namespace LicenseManLoader
             }
         }
 
-        ChunkManager chunk = new ChunkManager();
+        ChunkManager chunk;
 
         internal void HandleMsg(NetIncomingMessage inc)
         {
@@ -39,38 +44,59 @@ namespace LicenseManLoader
                 case NetIncomingMessageType.Data:
                     var header = inc.ReadByte();
 
-                    if (header == (byte)5)
+                    switch (header)
                     {
-                        string DisconnectReason = inc.ReadString();
-                        MessageBox.Show(DisconnectReason);
-                        Environment.Exit(-1);
+                        case (byte)PacketHeaders.Headers.PublicKey:
+                            string publickey = inc.ReadString();
+                            break;
+                        case (byte)PacketHeaders.Headers.Disconnect:
+                            string DisconnectReason = inc.ReadString();
+                            MessageBox.Show(DisconnectReason);
+                            Environment.Exit(-1);
+                            break;
+                        case (byte)PacketHeaders.Headers.Chunk:
+                            HandleChunk(inc); 
+                        break;
+                        case (byte)PacketHeaders.Headers.AssemblySettings:
+                        break;
                     }
-                    else if (header == (byte)11)
-                    {
-                        string publickey = inc.ReadString();
-                    }
-                    else if (header == (byte)20)
-                    {
-                        var length = inc.ReadInt32();
-                        var index = inc.ReadInt32();
-                        var max = inc.ReadInt32();
-
-                        Console.WriteLine("Got {0} out of {1}", index, max);
-
-                        byte[] bytes = new byte[length];
-                        inc.ReadBytes(bytes, 0, length);
-                        bytes = Crypto.DecryptToBytes(PrivateKey, bytes);
-
-                        Console.WriteLine("Got a binary of {0} bytes", bytes.Length);
-
-                        chunk.Add(index, bytes);
-                        if(index == max)
-                        {
-                            chunk.Run();
-                        }
-                    }
-
                     break;
+            }
+        }
+
+        private void HandleAssemblySettings(NetIncomingMessage inc)
+        {
+            var NamespaceClass = inc.ReadString();
+            var Method = inc.ReadString();
+
+            this.NamespaceClass = Crypto.DecryptToString(PrivateKey, NamespaceClass);
+            this.Method = Crypto.DecryptToString(PrivateKey, Method);
+
+            if (chunk == null)
+            {
+                chunk = new ChunkManager(this.NamespaceClass, this.Method);
+            }
+        }
+
+        private void HandleChunk(NetIncomingMessage inc)
+        {
+            
+            var length = inc.ReadInt32();
+            var index = inc.ReadInt32();
+            var max = inc.ReadInt32();
+
+            Console.WriteLine("Got {0} out of {1}", index, max);
+
+            byte[] bytes = new byte[length];
+            inc.ReadBytes(bytes, 0, length);
+            bytes = Crypto.DecryptToBytes(PrivateKey, bytes);
+
+            Console.WriteLine("Got a binary of {0} bytes", bytes.Length);
+
+            chunk.Add(index, bytes);
+            if (index == max)
+            {
+                chunk.Run();
             }
         }
     }

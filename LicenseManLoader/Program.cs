@@ -64,13 +64,12 @@ namespace LicenseManLoader
 
             Loader.SendPublicKey();
 
-            Thread.Sleep(350);
+            Thread.Sleep(1000);
 
             Loader.SendUsernameAndPassword();
 
-            //Thread.Sleep(350);
-
-            //Listener.Abort();
+            Thread.Sleep(1000);
+            Listener.Abort();
         }
     }
 }

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseManLoader", "License
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp", "ExampleApp\ExampleApp.csproj", "{BD52ABFF-04F6-4F9B-A396-CE675B834B6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseManShared", "LicenseManShared\LicenseManShared.csproj", "{AB775916-9CC1-494A-A626-C3259D1E907E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{BD52ABFF-04F6-4F9B-A396-CE675B834B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD52ABFF-04F6-4F9B-A396-CE675B834B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD52ABFF-04F6-4F9B-A396-CE675B834B6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB775916-9CC1-494A-A626-C3259D1E907E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB775916-9CC1-494A-A626-C3259D1E907E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB775916-9CC1-494A-A626-C3259D1E907E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB775916-9CC1-494A-A626-C3259D1E907E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

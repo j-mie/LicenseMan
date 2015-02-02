@@ -81,6 +81,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Config.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LicenseManShared\LicenseManShared.csproj">
+      <Project>{ab775916-9cc1-494a-a626-c3259d1e907e}</Project>
+      <Name>LicenseManShared</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

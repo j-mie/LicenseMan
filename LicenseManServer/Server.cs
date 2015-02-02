@@ -1,9 +1,11 @@
-﻿using Lidgren.Network;
+﻿using LicenseManShared;
+using Lidgren.Network;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LicenseManServer
@@ -41,7 +43,10 @@ namespace LicenseManServer
 
             while (true)
             {
-                if((Msg = NetServer.ReadMessage()) == null) continue;
+                if((Msg = NetServer.ReadMessage()) == null) {
+                    Thread.Sleep(1);
+                    continue;
+                };
 
                 HandleMsg(Msg);
             }
@@ -54,7 +59,7 @@ namespace LicenseManServer
             Logger.Info(@"Disconnecting {0}:[{2}] with reason {1}", ClientConn.RemoteEndPoint.Address, Message, c.Username);
 
             NetOutgoingMessage msg = NetServer.CreateMessage();
-            msg.Write((byte)5);
+            msg.Write((byte)PacketHeaders.Headers.Disconnect);
             msg.Write(Message);
 
 
@@ -72,7 +77,7 @@ namespace LicenseManServer
             data = Crypto.Encrypt(c.PublicKey, data);
 
             NetOutgoingMessage msg = NetServer.CreateMessage();
-            msg.Write((byte)20);
+            msg.Write((byte)PacketHeaders.Headers.Chunk);
             msg.Write(data.Length);
             msg.Write(index);
             msg.Write(max);
@@ -89,12 +94,14 @@ namespace LicenseManServer
                 case NetIncomingMessageType.Data:
                     byte type = inc.ReadByte();
 
-                    if(type == (byte)10)
+                    switch (type)
                     {
-                        HandlePublicKey(inc);
-                    } else if (type == (byte)11)
-                    {
-                        HandleLogin(inc);
+                        case (byte)PacketHeaders.Headers.PublicKey:
+                            HandlePublicKey(inc);
+                            break;
+                        case (byte)PacketHeaders.Headers.Login:
+                            HandleLogin(inc);
+                            break;
                     }
                     break;
 
@@ -164,7 +171,7 @@ namespace LicenseManServer
                 }
                 else if (!c.OwnsCopy)
                 {
-                    DisconnectWMsg("You do not own a copy of this software!", inc.SenderConnection);
+                    DisconnectWMsg("You do not own a copy of this software! Contact the owner!", inc.SenderConnection);
                 }
                 else
                 {
@@ -178,6 +185,16 @@ namespace LicenseManServer
                     Logger.Info("Klunk size = {0}", data.Count());
 
                     int i = 0;
+
+
+                    var NamespaceClassname = Crypto.Encrypt(c.PublicKey, Config.NameSpaceClass);
+                    var Method = Crypto.Encrypt(c.PublicKey, Config.Method);
+
+                    NetOutgoingMessage msg = NetServer.CreateMessage();
+                    msg.Write((byte)PacketHeaders.Headers.AssemblySettings);
+                    msg.Write(NamespaceClassname);
+                    msg.Write(Method);
+                    NetServer.SendMessage(msg, inc.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
                     foreach(var chunk in data)
                     {

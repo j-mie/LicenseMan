@@ -13,8 +13,14 @@ namespace LicenseManLoader
     {
         Dictionary<int, byte[]> chunks;
 
-        public ChunkManager()
+        string NamespaceClass;
+        string Method;
+
+        public ChunkManager(string NamespaceClass, string Method)
         {
+            this.NamespaceClass = NamespaceClass;
+            this.Method = Method;
+
             chunks = new Dictionary<int, byte[]>();
         }
 
