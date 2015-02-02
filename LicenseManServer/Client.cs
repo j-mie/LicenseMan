@@ -11,7 +11,7 @@ namespace LicenseManServer
     [Serializable]
     class Client
     {
-        public bool NewUser = false;
+        internal bool NewUser = false;
 
         public string Username = "";
         public string Password = "";

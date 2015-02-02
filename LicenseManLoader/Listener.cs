@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LicenseManLoader
 {
@@ -35,6 +36,12 @@ namespace LicenseManLoader
                 case NetIncomingMessageType.Data:
                     var header = inc.ReadByte();
                     
+                    if(header == (byte)5)
+                    {
+                        string DisconnectReason = inc.ReadString();
+                        MessageBox.Show(DisconnectReason);
+                        Environment.Exit(-1);
+                    } else
                     if(header == (byte)11)
                     {
                         string publickey = inc.ReadString();

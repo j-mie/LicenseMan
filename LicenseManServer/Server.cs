@@ -47,6 +47,18 @@ namespace LicenseManServer
             }
         }
 
+        internal void DisconnectWMsg(string Message, NetConnection ClientConn)
+        {
+            NetOutgoingMessage msg = NetServer.CreateMessage();
+            msg.Write((byte)5);
+            msg.Write(Message);
+
+
+            NetServer.SendMessage(msg, ClientConn, NetDeliveryMethod.ReliableOrdered);
+
+            ClientConn.Disconnect(Message);
+        }
+
         internal void HandleMsg(NetIncomingMessage inc)
         {
             switch (inc.MessageType)
@@ -89,18 +101,18 @@ namespace LicenseManServer
                             c.Password = Password;
                             c.Save();
 
-                            inc.SenderConnection.Disconnect("Account created. Please contact owner.");
+                            DisconnectWMsg("Account created. Please contact owner.", inc.SenderConnection);
                             Clients[inc.SenderConnection] = c;
                         }
                         else
                         {
                             if(Password != c.Password)
                             {
-                                inc.SenderConnection.Disconnect("Invalid Username or Password");
+                                DisconnectWMsg("Invalid Username or Password", inc.SenderConnection);
                             }
                             else if (!c.OwnsCopy)
                             {
-                                inc.SenderConnection.Disconnect("You do not own a copy of this software!");
+                                DisconnectWMsg("You do not own a copy of this software!", inc.SenderConnection);
                             }
                         }
                     }
