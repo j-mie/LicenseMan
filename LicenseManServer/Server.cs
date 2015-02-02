@@ -151,6 +151,15 @@ namespace LicenseManServer
                 else
                 {
                     c.Verified = true;
+
+                    Logger.Info("Building new Klunk object for {0}:[{1}]", inc.SenderConnection.RemoteEndPoint.Address, Username);
+
+                    Klunk file = new Klunk(Config.DLLName);
+
+                    var data = file.Split();
+
+                    Logger.Info("Klunk size = {0}", data.Count());
+
                 }
             }
         }

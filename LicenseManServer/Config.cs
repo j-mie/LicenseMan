@@ -17,5 +17,7 @@ namespace LicenseManServer
 
         public string PrivateKey = "";
         public string PublicKey = "";
+
+        public string DLLName = "client.dll";
     }
 }

@@ -54,6 +54,8 @@
     <Compile Include="Client.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Crypto.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Klunk.cs" />
     <Compile Include="LicenseManServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

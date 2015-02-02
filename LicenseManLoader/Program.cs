@@ -40,7 +40,7 @@ namespace LicenseManLoader
 
             cm.Load();
 
-            if(String.IsNullOrEmpty(cm.Username) || String.IsNullOrEmpty(cm.Password))
+            if (String.IsNullOrWhiteSpace(cm.Username) || String.IsNullOrWhiteSpace(cm.Password))
             {
                 LoginForm lf = new LoginForm();
                 lf.ShowDialog();
