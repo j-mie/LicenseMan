@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace LicenseManServer
 {
-    class Program
+    class Config
     {
-        static void Main(string[] args)
-        {
-        }
+
     }
 }
