@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,7 +29,13 @@ namespace LicenseManServer
                 Logger.Warn("Writing out config file 'LicenseMan.config' - please fill it in");
                 Config = new Config();
 
-                var Json = JsonConvert.SerializeObject(Config);
+                CspParameters cspParams = new CspParameters { ProviderType = 1 };
+                RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(4096, cspParams);
+
+                Config.PublicKey = Convert.ToBase64String(rsaProvider.ExportCspBlob(false));
+                Config.PrivateKey = Convert.ToBase64String(rsaProvider.ExportCspBlob(true));
+
+                var Json = JsonConvert.SerializeObject(Config, Formatting.Indented);
                 File.WriteAllText("LicenseMan.config", Json);
                 Environment.Exit(-1);
             }

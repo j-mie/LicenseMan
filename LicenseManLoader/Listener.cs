@@ -33,6 +33,13 @@ namespace LicenseManLoader
             switch (inc.MessageType)
             {
                 case NetIncomingMessageType.Data:
+                    var header = inc.ReadByte();
+                    
+                    if(header == (byte)11)
+                    {
+                        string publickey = inc.ReadString();
+                    }
+
                     var bytes = new byte[inc.LengthBytes];
                     inc.ReadBytes(bytes, 0, inc.LengthBytes);
                     Console.WriteLine("Got a binary of {0} bytes", bytes.Length);

@@ -13,7 +13,8 @@ namespace LicenseManServer
         NetServer NetServer;
         NetPeerConfiguration Config;
         Logger Logger;
-        NetEncryption Encryption;
+
+        Dictionary<NetConnection, string> Keys = new Dictionary<NetConnection, string>();
 
         internal Server(int Port, bool UPnP)
         {
@@ -51,9 +52,11 @@ namespace LicenseManServer
 
                 case NetIncomingMessageType.Data:
                     byte type = inc.ReadByte();
+
                     if(type == (byte)10)
                     {
-                        Logger.Debug("Bin request from: {0}", inc.SenderConnection.RemoteEndPoint.Address);
+                        Logger.Debug("Got public key from: {0}", inc.SenderConnection.RemoteEndPoint.Address);
+                        Keys.Add(inc.SenderConnection, inc.ReadString());
                     }
                     break;
 

@@ -19,12 +19,26 @@ namespace LicenseManLoader
         NetClient NetClient;
         Listener Listener;
 
-        internal LicenseManLoader()
+        string PublicKey;
+        string PrivateKey;
+
+        internal string ServerPublicKey;
+
+        internal LicenseManLoader(string publicKey, string privateKey)
         {
             NetPeerConfig = new NetPeerConfiguration("LicenseMan");
             NetClient = new NetClient(NetPeerConfig);
             Listener = new Listener(NetClient);
 
+            this.PublicKey = publicKey;
+            this.PrivateKey = privateKey;
+
+            GetConfig();
+            GetKey();
+        }
+
+        private void GetConfig()
+        {
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = "LicenseManLoader.Config.txt";
 
@@ -47,8 +61,29 @@ namespace LicenseManLoader
                     #endif
                 }
             }
-            
-            
+        }
+
+        private void GetKey()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "LicenseManLoader.ServerPublic.key";
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                try
+                {
+                    ServerPublicKey = reader.ReadLine();
+                }
+                catch (Exception)
+                {
+                    #if DEBUG
+                    throw;
+                    #else
+                    MessageBox.Show("Error loading server key!");
+                    #endif
+                }
+            }
         }
 
         internal void Load()
@@ -59,7 +94,7 @@ namespace LicenseManLoader
             Listener.Listen();
         }
 
-        internal void DownloadAndRun()
+        internal void SendPublicKey()
         {
             while(true)
             {
@@ -74,9 +109,14 @@ namespace LicenseManLoader
             }
 
             NetOutgoingMessage msg = NetClient.CreateMessage();
-            msg.Write((byte)10);
-
+            msg.Write(10);
+            msg.Write(Crypto.Encrypt(ServerPublicKey, PublicKey));
             NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        internal void GetUsernameAndPassword()
+        {
+
         }
     }
 }
