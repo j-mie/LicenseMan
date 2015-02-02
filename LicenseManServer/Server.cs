@@ -142,11 +142,8 @@ namespace LicenseManServer
             inc.ReadInt32(); // Padding?!?
             string PasswordBase64 = inc.ReadString();
 
-            byte[] UsernameBytes = Convert.FromBase64String(UsernameBase64);
-            byte[] PasswordBytes = Convert.FromBase64String(PasswordBase64);
-
-            var Username = Crypto.DecryptToString(this.Config.PrivateKey, UsernameBytes);
-            var Password = Crypto.DecryptToString(this.Config.PrivateKey, PasswordBytes);
+            var Username = Crypto.DecryptToString(this.Config.PrivateKey, UsernameBase64);
+            var Password = Crypto.DecryptToString(this.Config.PrivateKey, PasswordBase64);
 
             Logger.Info("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
