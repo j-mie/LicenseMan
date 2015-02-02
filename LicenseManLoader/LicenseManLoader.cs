@@ -31,7 +31,7 @@ namespace LicenseManLoader
         {
             NetPeerConfig = new NetPeerConfiguration("LicenseMan");
             NetClient = new NetClient(NetPeerConfig);
-            Listener = new Listener(NetClient);
+            Listener = new Listener(NetClient, privateKey);
 
             this.PublicKey = publicKey;
             this.PrivateKey = privateKey;

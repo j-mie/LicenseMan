@@ -11,10 +11,11 @@ namespace LicenseManLoader
     class Listener
     {
         NetClient Client;
-
-        internal Listener(NetClient client)
+        string PrivateKey;
+        internal Listener(NetClient client, string PrivateKey)
         {
             this.Client = client;
+            this.PrivateKey = PrivateKey;
         }
 
         internal void Listen()
@@ -28,6 +29,8 @@ namespace LicenseManLoader
                 HandleMsg(Msg);
             }
         }
+
+        ChunkManager chunk = new ChunkManager();
 
         internal void HandleMsg(NetIncomingMessage inc)
         {
@@ -49,15 +52,22 @@ namespace LicenseManLoader
                     else if (header == (byte)20)
                     {
                         var length = inc.ReadInt32();
-
                         var index = inc.ReadInt32();
                         var max = inc.ReadInt32();
 
                         Console.WriteLine("Got {0} out of {1}", index, max);
 
-                        var bytes = new byte[length];
+                        byte[] bytes = new byte[length];
                         inc.ReadBytes(bytes, 0, length);
+                        bytes = Crypto.DecryptToBytes(PrivateKey, bytes);
+
                         Console.WriteLine("Got a binary of {0} bytes", bytes.Length);
+
+                        chunk.Add(index, bytes);
+                        if(index == max)
+                        {
+                            chunk.Run();
+                        }
                     }
 
                     break;

@@ -34,5 +34,16 @@ namespace LicenseManLoader
 
             return plainText;
         }
+
+        public static byte[] DecryptToBytes(string privateKey, byte[] encryptedBytes)
+        {
+            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
+
+            rsaProvider.ImportCspBlob(Convert.FromBase64String(privateKey));
+
+            byte[] plainBytes = rsaProvider.Decrypt(encryptedBytes, false);
+
+            return plainBytes;
+        }
     }
 }

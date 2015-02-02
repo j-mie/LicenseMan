@@ -68,9 +68,9 @@ namespace LicenseManLoader
 
             Loader.SendUsernameAndPassword();
 
-            Thread.Sleep(350);
+            //Thread.Sleep(350);
 
-            Listener.Abort();
+            //Listener.Abort();
         }
     }
 }
