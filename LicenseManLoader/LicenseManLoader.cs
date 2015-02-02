@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,9 +15,16 @@ namespace LicenseManLoader
     class LicenseManLoader
     {
         IPEndPoint Endpoint;
+        NetPeerConfiguration NetPeerConfig;
+        NetClient NetClient;
+        Listener Listener;
 
         internal LicenseManLoader()
         {
+            NetPeerConfig = new NetPeerConfiguration("LicenseMan");
+            NetClient = new NetClient(NetPeerConfig);
+            Listener = new Listener(NetClient);
+
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = "LicenseManLoader.Config.txt";
 
@@ -44,7 +53,18 @@ namespace LicenseManLoader
 
         internal void Load()
         {
+            NetClient.Start();
+            NetClient.Connect(Endpoint);
 
+            Listener.Listen();
+        }
+
+        internal void DownloadAndRun()
+        {
+            NetOutgoingMessage msg = NetClient.CreateMessage();
+            msg.Data = new byte[42];
+
+            NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
     }
 }

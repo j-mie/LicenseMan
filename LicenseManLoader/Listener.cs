@@ -5,35 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LicenseManServer
+namespace LicenseManLoader
 {
-    class Server
+    class Listener
     {
-        NetServer NetServer;
-        NetPeerConfiguration Config;
+        NetClient Client;
 
-        internal Server(int Port, bool UPnP)
+        internal Listener(NetClient client)
         {
-            Config = new NetPeerConfiguration("LicenseMan")
-            {
-                MaximumConnections = 1000,
-                ConnectionTimeout = 30,
-                Port = Port,
-                EnableUPnP = UPnP
-            };
-
-            NetServer = new NetServer(this.Config);
+            this.Client = client;
         }
 
         internal void Listen()
         {
-            NetServer.Start();
-
             NetIncomingMessage Msg;
 
             while (true)
             {
-                if((Msg = NetServer.ReadMessage()) == null) continue;
+                if ((Msg = Client.ReadMessage()) == null) continue;
 
                 HandleMsg(Msg);
             }

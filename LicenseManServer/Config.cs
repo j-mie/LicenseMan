@@ -13,5 +13,6 @@ namespace LicenseManServer
     {
         public string ApplicationName = "";
         public int ListenPort = 4560;
+        public bool EnableUPnP = false;
     }
 }

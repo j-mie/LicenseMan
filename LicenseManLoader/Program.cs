@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LicenseManLoader
@@ -12,7 +13,12 @@ namespace LicenseManLoader
         {
             LicenseManLoader Loader = new LicenseManLoader();
 
-            Loader.Load();
+            new Thread(() => {
+                Loader.Load();
+            }).Start();
+
+
+            Loader.DownloadAndRun();
         }
     }
 }
