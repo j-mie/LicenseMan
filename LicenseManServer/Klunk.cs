@@ -27,11 +27,9 @@ namespace LicenseManServer
         {
             List<byte[]> List = new List<byte[]>();
 
-            int Bits = Bytes.Length;
-            int Size = 117 + 5; // ((Keysize(1024) - 384) / 8) + 37
-            int Splits = (int)Math.Ceiling((double)Bits / (double)Size);
+            int Size = 117; // ((Keysize(1024) - 384) / 8) + 37
 
-            foreach (byte[] copySlice in Bytes.Slices(Splits))
+            foreach (byte[] copySlice in Bytes.Slices(Size))
             {
                 List.Add(copySlice);
             }

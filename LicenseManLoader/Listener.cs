@@ -52,11 +52,11 @@ namespace LicenseManLoader
                             break;
                         case (byte)PacketHeaders.Headers.Disconnect:
                             string DisconnectReason = inc.ReadString();
-                            //if (DisconnectReason == "Invalid Username or Password")
-                            //{
-                            //    var cm = new Credential { Target = "LicenseMan" };
-                            //    cm.Delete();
-                            //}
+                            if (DisconnectReason == "Invalid Username or Password")
+                            {
+                                var cm = new Credential { Target = "LicenseMan" };
+                                cm.Delete();
+                            }
                             MessageBox.Show(DisconnectReason);
                             Environment.Exit(59);
                             break;
