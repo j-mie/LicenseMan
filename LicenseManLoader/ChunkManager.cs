@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -30,32 +31,58 @@ namespace LicenseManLoader
             chunks.Add(index, data);
         }
 
+        private byte[] Decompress(MemoryStream MemoryStream)
+        {
+            using (GZipStream stream = new GZipStream(MemoryStream, CompressionMode.Decompress))
+            {
+                const int size = 4096;
+                byte[] buffer = new byte[size];
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    int count = 0;
+                    do
+                    {
+                        count = stream.Read(buffer, 0, size);
+                        if (count > 0)
+                        {
+                            memory.Write(buffer, 0, count);
+                        }
+                    }
+                    while (count > 0);
+                    return memory.ToArray();
+                }
+            }
+        }
+
         public void Run()
         {
-            //int size = chunks.Values.Select(x => x.Length).Sum();
-            //byte[] data = new byte[size];
+            var ordered = chunks.OrderBy(x => x.Key); // Order the chunks, probably already done but just in case!
+
             using(MemoryStream ms = new MemoryStream())
             {
-                var ordered = chunks.OrderBy(x => x.Key);
-
-                foreach (var chunk in ordered) //TODO: Use a memory stream
+                foreach (var chunk in ordered)
                 {
-                    ms.Write(chunk.Value, 0, chunk.Value.Length);
+                    ms.Write(chunk.Value, 0, chunk.Value.Length); // Write each chunk to the memory stream
                 }
 
-                var asm = Assembly.Load(ms.ToArray());
-                Console.WriteLine(asm.GetName());
+                ms.Position = 0; // Reset the position of the stream
 
-                Type t  = asm.GetType(NamespaceClass);
-                var methodInfo = t.GetMethod(Method);
-                if (methodInfo == null) // the method doesn't exist
+                var AsmBytes = Decompress(ms); // Decompress the stream which was GZip compressed from the server
+
+                var Asm = Assembly.Load(AsmBytes);
+                Console.WriteLine(Asm.GetName());
+
+                Type Type = Asm.GetType(NamespaceClass);
+                var MethodInfo = Type.GetMethod(Method);
+
+                if (MethodInfo == null) // the method doesn't exist
                 {
                     throw new Exception("Invalid binary sent over the wire!");
                 }
 
-                var o = Activator.CreateInstance(t);
+                var Instance = Activator.CreateInstance(Type);
 
-                var result = methodInfo.Invoke(o, new object[0]);
+                var result = MethodInfo.Invoke(Instance, new object[0]);
 
                 if(ExitOnFinish)
                     Environment.Exit(0);

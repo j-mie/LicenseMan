@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LicenseManShared;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace LicenseManServer
         {
             if(File.Exists(AsmName))
             {
-                Bytes = File.ReadAllBytes(AsmName);
+                Bytes = Utils.GZipCompressBytes(File.ReadAllBytes(AsmName));
             }
             else
             {
