@@ -43,7 +43,8 @@ namespace LicenseManServer
 
             while (true)
             {
-                if((Msg = NetServer.ReadMessage()) == null) {
+                if ((Msg = NetServer.ReadMessage()) == null)
+                {
                     Thread.Sleep(1);
                     continue;
                 };
@@ -55,7 +56,7 @@ namespace LicenseManServer
         internal void DisconnectWMsg(string Message, NetConnection ClientConn)
         {
             var c = Clients[ClientConn];
-            if(c != null && String.IsNullOrWhiteSpace(c.Username))
+            if (c != null && String.IsNullOrWhiteSpace(c.Username))
                 Logger.Info(@"Disconnecting {0}:[{2}] with reason {1}", ClientConn.RemoteEndPoint.Address, Message, c.Username);
             else
                 Logger.Info(@"Disconnecting {0} with reason {1}", ClientConn.RemoteEndPoint.Address, Message);
@@ -121,7 +122,7 @@ namespace LicenseManServer
                     Logger.Warn(inc.ReadString());
                     break;
                 //case NetIncomingMessageType.VerboseDebugMessage:
-                    
+
             }
         }
 
@@ -149,27 +150,27 @@ namespace LicenseManServer
 
             Logger.Info("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
-            if(Username.Length >= 14 || Username.Length <= 3)
+            if (Username.Length >= 14 || Username.Length <= 3)
             {
                 DisconnectWMsg("Username must be longer than 3 characters and less than 14", inc.SenderConnection);
                 return;
             }
 
-            if(Username != Utils.RemoveSpecialCharacters(Username))
+            if (Username != Utils.RemoveSpecialCharacters(Username))
             {
                 DisconnectWMsg("Invalid Username! No special characters", inc.SenderConnection);
                 return;
             }
 
             var c = Client.Load(Username);
-
+            //var OldKey = Client.PublicKey; // Used to verify
             c.PublicKey = Client.PublicKey;
-
             Clients[inc.SenderConnection] = c;
 
             if (c.NewUser == true)
             {
                 var salt = Crypto.GenerateSalt();
+                c.PublicKey = Client.PublicKey;
                 c.Username = Username;
                 c.Password = Convert.ToBase64String(Crypto.HashPassword(Password, salt));
                 c.Salt = Convert.ToBase64String(salt);
@@ -182,39 +183,56 @@ namespace LicenseManServer
                 if (Convert.ToBase64String(Crypto.HashPassword(Password, Convert.FromBase64String(c.Salt))) != c.Password)
                 {
                     DisconnectWMsg("Invalid Username or Password", inc.SenderConnection);
+                    return;
                 }
-                else if (!c.OwnsCopy)
+
+                //if (c.PublicKey != OldKey) // Good idea but insecure storing the keys
+                //{
+                //    if (String.IsNullOrWhiteSpace(c.PublicKey)) // Easy way to reset if someone changes PC
+                //    {
+                //        c.PublicKey = OldKey;
+                //        c.Save();
+                //    }
+                //    else
+                //    {
+                //        DisconnectWMsg("HWID Error. Please contact owner.", inc.SenderConnection);
+                //        return;
+                //    }
+
+                //}
+
+                if (!c.OwnsCopy)
                 {
                     DisconnectWMsg("You do not own a copy of this software! Contact the owner!", inc.SenderConnection);
+                    return;
                 }
-                else
+
+
+                c.Verified = true;
+
+                Logger.Info("Building new Klunk object for {0}:[{1}]", inc.SenderConnection.RemoteEndPoint.Address, Username);
+
+                Klunk file = new Klunk(Config.FileName);
+                var data = file.Split();
+
+                Logger.Info("Klunk size = {0}", data.Count());
+
+                int i = 0;
+
+                var NamespaceClassname = Crypto.EncryptToString(c.PublicKey, Config.NameSpaceClass);
+                var Method = Crypto.EncryptToString(c.PublicKey, Config.Method);
+
+                NetOutgoingMessage msg = NetServer.CreateMessage();
+                msg.Write((byte)PacketHeaders.Headers.AssemblySettings);
+                msg.Write(NamespaceClassname);
+                msg.Write(Method);
+                msg.Write(Config.ExitOnFinish);
+                NetServer.SendMessage(msg, inc.SenderConnection, NetDeliveryMethod.ReliableOrdered);
+
+                foreach (var chunk in data)
                 {
-                    c.Verified = true;
-
-                    Logger.Info("Building new Klunk object for {0}:[{1}]", inc.SenderConnection.RemoteEndPoint.Address, Username);
-
-                    Klunk file = new Klunk(Config.FileName);
-                    var data = file.Split();
-
-                    Logger.Info("Klunk size = {0}", data.Count());
-
-                    int i = 0;
-
-                    var NamespaceClassname = Crypto.EncryptToString(c.PublicKey, Config.NameSpaceClass);
-                    var Method = Crypto.EncryptToString(c.PublicKey, Config.Method);
-
-                    NetOutgoingMessage msg = NetServer.CreateMessage();
-                    msg.Write((byte)PacketHeaders.Headers.AssemblySettings);
-                    msg.Write(NamespaceClassname);
-                    msg.Write(Method);
-                    msg.Write(Config.ExitOnFinish);
-                    NetServer.SendMessage(msg, inc.SenderConnection, NetDeliveryMethod.ReliableOrdered);
-
-                    foreach(var chunk in data)
-                    {
-                        i++;
-                        SendChunk(i, data.Count(), chunk, inc.SenderConnection);
-                    }
+                    i++;
+                    SendChunk(i, data.Count(), chunk, inc.SenderConnection);
                 }
             }
         }

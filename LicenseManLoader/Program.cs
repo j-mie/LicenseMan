@@ -28,7 +28,7 @@ namespace LicenseManLoader
             ShowWindow(handle, SW_HIDE);
             #endif
 
-            var cm = new Credential { Target = "LicenseMan" };
+            var cm = new Credential { Target = "LicenseMan", PersistanceType = PersistanceType.LocalComputer };
 
             if(args.Length >= 1)
             {
