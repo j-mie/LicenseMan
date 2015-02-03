@@ -86,11 +86,22 @@ namespace LicenseManLoader
             }
         }
 
+        ProgressBar pb;
+
         private void HandleChunk(NetIncomingMessage inc)
         {
             var length = inc.ReadInt32();
             var index = inc.ReadInt32();
             var max = inc.ReadInt32();
+
+            if(pb == null)
+            {
+                pb = new ProgressBar();
+                pb.Show();
+                pb.Invoke(new Action(() => pb.WireUpProgressBar(max)));
+            }
+
+            pb.Invoke(new Action(() => pb.SetProgressBar(index)));
 
             Console.WriteLine("Got {0} out of {1}", index, max);
 
@@ -103,6 +114,7 @@ namespace LicenseManLoader
             chunk.Add(index, bytes);
             if (index == max)
             {
+                pb.Hide();
                 chunk.Run();
             }
         }
