@@ -37,7 +37,7 @@ namespace LicenseManServer
 
                 var Json = JsonConvert.SerializeObject(Config, Formatting.Indented);
                 File.WriteAllText("LicenseMan.config", Json);
-                Environment.Exit(-1);
+                Environment.Exit(10);
             }
         }
 

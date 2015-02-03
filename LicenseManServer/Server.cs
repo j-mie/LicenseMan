@@ -207,6 +207,7 @@ namespace LicenseManServer
                     msg.Write((byte)PacketHeaders.Headers.AssemblySettings);
                     msg.Write(NamespaceClassname);
                     msg.Write(Method);
+                    msg.Write(Config.ExitOnFinish);
                     NetServer.SendMessage(msg, inc.SenderConnection, NetDeliveryMethod.ReliableOrdered);
 
                     foreach(var chunk in data)

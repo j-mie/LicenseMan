@@ -58,7 +58,7 @@ namespace LicenseManLoader
                             //    cm.Delete();
                             //}
                             MessageBox.Show(DisconnectReason);
-                            Environment.Exit(-1);
+                            Environment.Exit(59);
                             break;
                         case (byte)PacketHeaders.Headers.Chunk:
                             HandleChunk(inc); 
@@ -75,13 +75,14 @@ namespace LicenseManLoader
         {
             var NamespaceClass = inc.ReadString();
             var Method = inc.ReadString();
+            var ExitOnFinish = inc.ReadBoolean();
 
             this.NamespaceClass = Crypto.DecryptToString(PrivateKey, NamespaceClass);
             this.Method = Crypto.DecryptToString(PrivateKey, Method);
 
             if (chunk == null)
             {
-                chunk = new ChunkManager(this.NamespaceClass, this.Method);
+                chunk = new ChunkManager(this.NamespaceClass, this.Method, ExitOnFinish);
             }
         }
 

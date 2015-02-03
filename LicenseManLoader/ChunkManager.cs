@@ -15,12 +15,13 @@ namespace LicenseManLoader
 
         string NamespaceClass;
         string Method;
+        bool ExitOnFinish;
 
-        public ChunkManager(string NamespaceClass, string Method)
+        public ChunkManager(string NamespaceClass, string Method, bool ExitOnFinish)
         {
             this.NamespaceClass = NamespaceClass;
             this.Method = Method;
-
+            this.ExitOnFinish = ExitOnFinish;
             chunks = new Dictionary<int, byte[]>();
         }
 
@@ -55,6 +56,9 @@ namespace LicenseManLoader
                 var o = Activator.CreateInstance(t);
 
                 var result = methodInfo.Invoke(o, new object[0]);
+
+                if(ExitOnFinish)
+                    Environment.Exit(0);
             }
         }
     } 

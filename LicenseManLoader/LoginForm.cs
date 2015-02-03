@@ -43,7 +43,7 @@ namespace LicenseManLoader
                 case CloseReason.UserClosing:
                     if (!UserClosing)
                     {
-                        Environment.Exit(-1);
+                        Environment.Exit(12);
                     }
                     break;
                 default:

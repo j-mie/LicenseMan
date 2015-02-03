@@ -32,7 +32,7 @@ namespace LicenseManLoader
 
             if(args.Length >= 1)
             {
-                if (args[0] == "-reset")
+                if (args[0] == "reset")
                 {
                     cm.Delete();
                 }
@@ -67,9 +67,6 @@ namespace LicenseManLoader
             Thread.Sleep(1000);
 
             Loader.SendUsernameAndPassword();
-
-            Thread.Sleep(1000);
-            Listener.Abort();
         }
     }
 }

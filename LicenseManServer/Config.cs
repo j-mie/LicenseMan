@@ -18,6 +18,7 @@ namespace LicenseManServer
         public string FileName = "client.dll";
         public string NameSpaceClass = "ExampleApp.Program";
         public string Method = "Main";
+        public bool ExitOnFinish = true;
 
 
         public string PrivateKey = "";
