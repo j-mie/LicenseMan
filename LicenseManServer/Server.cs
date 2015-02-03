@@ -55,8 +55,10 @@ namespace LicenseManServer
         internal void DisconnectWMsg(string Message, NetConnection ClientConn)
         {
             var c = Clients[ClientConn];
-
-            Logger.Info(@"Disconnecting {0}:[{2}] with reason {1}", ClientConn.RemoteEndPoint.Address, Message, c.Username);
+            if(c != null && String.IsNullOrWhiteSpace(c.Username))
+                Logger.Info(@"Disconnecting {0}:[{2}] with reason {1}", ClientConn.RemoteEndPoint.Address, Message, c.Username);
+            else
+                Logger.Info(@"Disconnecting {0} with reason {1}", ClientConn.RemoteEndPoint.Address, Message);
 
             NetOutgoingMessage msg = NetServer.CreateMessage();
             msg.Write((byte)PacketHeaders.Headers.Disconnect);
@@ -146,6 +148,18 @@ namespace LicenseManServer
             var Password = Crypto.DecryptToString(this.Config.PrivateKey, PasswordBase64);
 
             Logger.Info("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
+
+            if(Username.Length >= 14 || Username.Length <= 3)
+            {
+                DisconnectWMsg("Username must be longer than 3 characters and less than 14", inc.SenderConnection);
+                return;
+            }
+
+            if(Username != Utils.RemoveSpecialCharacters(Username))
+            {
+                DisconnectWMsg("Invalid Username! No special characters", inc.SenderConnection);
+                return;
+            }
 
             var c = Client.Load(Username);
 
