@@ -203,7 +203,7 @@ namespace LicenseManServer
 
                 if (c.HWID != HWID) // Good idea but insecure storing the keys
                 {
-                    if (String.IsNullOrWhiteSpace(c.HWID)) // Easy way to reset if someone changes PC or if migrating from old version!
+                    if (String.IsNullOrWhiteSpace(c.HWID) && !String.IsNullOrWhiteSpace(HWID)) // Easy way to reset if someone changes PC or if migrating from old version!
                     {
                         c.HWID = HWID;
                         c.Save();
