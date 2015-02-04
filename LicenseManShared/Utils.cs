@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,5 +35,20 @@ namespace LicenseManShared
                 return memory.ToArray();
             }
         }
+
+        public static string GetCpuId()
+        {
+            ManagementClass cpuManager = new ManagementClass("win32_processor");
+            ManagementObjectCollection cpuCollection = cpuManager.GetInstances();
+
+            foreach (ManagementObject cpu in cpuCollection)
+            {
+                return cpu.Properties["processorID"].Value.ToString();
+            }
+            
+            throw new Exception("No CPU?!?");
+        }
+
+        public static int ProtocolVersion = 2;
     }
 }

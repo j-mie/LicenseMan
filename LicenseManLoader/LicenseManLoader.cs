@@ -57,7 +57,12 @@ namespace LicenseManLoader
             {
                 try
                 {
+                    #if DEBUG
+                    reader.ReadLine();
+                    var IP = IPAddress.Parse("127.0.0.1");
+                    #else
                     var IP = IPAddress.Parse(reader.ReadLine());
+                    #endif
                     var Port = Convert.ToInt32(reader.ReadLine());
 
                     Endpoint = new IPEndPoint(IP, Port);
@@ -138,14 +143,14 @@ namespace LicenseManLoader
             NetOutgoingMessage msg = NetClient.CreateMessage();
             var username = Crypto.EncryptToString(ServerPublicKey, Username);
             var password = Crypto.EncryptToString(ServerPublicKey, Password);
+            var hwid = Crypto.EncryptToString(ServerPublicKey, Utils.GetCpuId());
 
             msg.Write((byte)PacketHeaders.Headers.Login);
-
-            msg.Write(1);
+            msg.Write(Utils.ProtocolVersion);
             msg.Write(username);
-            msg.Write(2);
             msg.Write(password);
-            
+            msg.Write(hwid);
+
             NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
         }
     }

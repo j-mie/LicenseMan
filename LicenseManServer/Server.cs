@@ -92,38 +92,43 @@ namespace LicenseManServer
 
         internal void HandleMsg(NetIncomingMessage inc)
         {
-            switch (inc.MessageType)
+            try
             {
+                switch (inc.MessageType)
+                {
+                    case NetIncomingMessageType.Data:
+                        byte type = inc.ReadByte();
 
-                case NetIncomingMessageType.Data:
-                    byte type = inc.ReadByte();
+                        switch (type)
+                        {
+                            case (byte)PacketHeaders.Headers.PublicKey:
+                                HandlePublicKey(inc);
+                                break;
+                            case (byte)PacketHeaders.Headers.Login:
+                                HandleLogin(inc);
+                                break;
+                        }
+                        break;
 
-                    switch (type)
-                    {
-                        case (byte)PacketHeaders.Headers.PublicKey:
-                            HandlePublicKey(inc);
-                            break;
-                        case (byte)PacketHeaders.Headers.Login:
-                            HandleLogin(inc);
-                            break;
-                    }
-                    break;
+                    case NetIncomingMessageType.StatusChanged:
+                        Logger.Debug("{0} status changed to: {1}", inc.SenderConnection.RemoteEndPoint.Address, inc.SenderConnection.Status);
+                        break;
 
-                case NetIncomingMessageType.StatusChanged:
-                    Logger.Debug("{0} status changed to: {1}", inc.SenderConnection.RemoteEndPoint.Address, inc.SenderConnection.Status);
-                    break;
-
-                case NetIncomingMessageType.DebugMessage:
-                    Logger.Debug(inc.ReadString());
-                    break;
-                case NetIncomingMessageType.ErrorMessage:
-                    Logger.Error(inc.ReadString());
-                    break;
-                case NetIncomingMessageType.WarningMessage:
-                    Logger.Warn(inc.ReadString());
-                    break;
-                //case NetIncomingMessageType.VerboseDebugMessage:
-
+                    case NetIncomingMessageType.DebugMessage:
+                        Logger.Debug(inc.ReadString());
+                        break;
+                    case NetIncomingMessageType.ErrorMessage:
+                        Logger.Error(inc.ReadString());
+                        break;
+                    case NetIncomingMessageType.WarningMessage:
+                        Logger.Warn(inc.ReadString());
+                        break;
+                    //case NetIncomingMessageType.VerboseDebugMessage:
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex);
             }
         }
 
@@ -141,13 +146,21 @@ namespace LicenseManServer
         {
             var Client = Clients[inc.SenderConnection];
 
-            inc.ReadInt32(); // Padding?!?
+            int ProtocolVersion = inc.ReadInt32();
+
+            if(ProtocolVersion != Utils.ProtocolVersion)
+            {
+                DisconnectWMsg("Incorrect Protocol Version! Update Updater!", inc.SenderConnection);
+                return;
+            }
+
             string UsernameBase64 = inc.ReadString();
-            inc.ReadInt32(); // Padding?!?
             string PasswordBase64 = inc.ReadString();
+            string HWIDBase64 = inc.ReadString();
 
             var Username = Crypto.DecryptToString(this.Config.PrivateKey, UsernameBase64);
             var Password = Crypto.DecryptToString(this.Config.PrivateKey, PasswordBase64);
+            var HWID = Crypto.DecryptToString(this.Config.PrivateKey, HWIDBase64);
 
             Logger.Info("Got Username and Password from: {0} - {1}", inc.SenderConnection.RemoteEndPoint.Address, Username);
 
@@ -175,6 +188,7 @@ namespace LicenseManServer
                 c.Username = Username;
                 c.Password = Convert.ToBase64String(Crypto.HashPassword(Password, salt));
                 c.Salt = Convert.ToBase64String(salt);
+                c.HWID = HWID;
                 c.Save();
 
                 DisconnectWMsg("Account created. Please contact owner.", inc.SenderConnection);
@@ -187,20 +201,19 @@ namespace LicenseManServer
                     return;
                 }
 
-                //if (c.PublicKey != OldKey) // Good idea but insecure storing the keys
-                //{
-                //    if (String.IsNullOrWhiteSpace(c.PublicKey)) // Easy way to reset if someone changes PC
-                //    {
-                //        c.PublicKey = OldKey;
-                //        c.Save();
-                //    }
-                //    else
-                //    {
-                //        DisconnectWMsg("HWID Error. Please contact owner.", inc.SenderConnection);
-                //        return;
-                //    }
-
-                //}
+                if (c.HWID != HWID) // Good idea but insecure storing the keys
+                {
+                    if (String.IsNullOrWhiteSpace(c.HWID)) // Easy way to reset if someone changes PC or if migrating from old version!
+                    {
+                        c.HWID = HWID;
+                        c.Save();
+                    }
+                    else
+                    {
+                        DisconnectWMsg("HWID Error. Please contact owner.", inc.SenderConnection);
+                        return;
+                    }
+                }
 
                 if (!c.OwnsCopy)
                 {

@@ -21,6 +21,7 @@ namespace LicenseManServer
         public bool OwnsCopy = false;
 
         public string PublicKey;
+        public string HWID = "";
 
         public void Save()
         {
