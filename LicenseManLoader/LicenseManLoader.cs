@@ -30,7 +30,10 @@ namespace LicenseManLoader
 
         internal LicenseManLoader(string publicKey, string privateKey, string username, string password)
         {
-            NetPeerConfig = new NetPeerConfiguration("LicenseMan");
+            NetPeerConfig = new NetPeerConfiguration("LicenseMan")
+            {
+                UseMessageRecycling = false
+            };
             NetClient = new NetClient(NetPeerConfig);
             Listener = new Listener(NetClient, privateKey);
 
@@ -103,10 +106,19 @@ namespace LicenseManLoader
 
         internal void SendPublicKey()
         {
+            int i = 5 * 100; // 5 seconds
             while(true)
             {
+                if(i == 0)
+                {
+                    MessageBox.Show("Unable to connect to server");
+                    Environment.Exit(-1);
+                    //throw new Exception("Unable to connect to server!");
+                }
+
                 if(NetClient.ConnectionStatus != NetConnectionStatus.Connected)
                 {
+                    i--;
                     Thread.Sleep(10);
                 }
                 else

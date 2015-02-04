@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -30,7 +31,11 @@ namespace LicenseManLoader
 
             while (true)
             {
-                if ((Msg = Client.ReadMessage()) == null) continue;
+                if ((Msg = Client.ReadMessage()) == null)
+                {
+                    Thread.Sleep(1);
+                    continue;
+                };
 
                 HandleMsg(Msg);
             }
@@ -61,7 +66,7 @@ namespace LicenseManLoader
                             Environment.Exit(59);
                             break;
                         case (byte)PacketHeaders.Headers.Chunk:
-                            HandleChunk(inc); 
+                            HandleChunk(ref inc); 
                         break;
                         case (byte)PacketHeaders.Headers.AssemblySettings:
                             HandleAssemblySettings(inc);
@@ -88,7 +93,7 @@ namespace LicenseManLoader
 
         ProgressBar pb;
 
-        private void HandleChunk(NetIncomingMessage inc)
+        private void HandleChunk(ref NetIncomingMessage inc)
         {
             var length = inc.ReadInt32();
             var index = inc.ReadInt32();

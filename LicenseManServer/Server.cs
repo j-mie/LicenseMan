@@ -29,7 +29,8 @@ namespace LicenseManServer
                 MaximumConnections = 1000,
                 ConnectionTimeout = 30,
                 Port = Config.ListenPort,
-                EnableUPnP = Config.EnableUPnP
+                EnableUPnP = Config.EnableUPnP,
+                UseMessageRecycling = false
             };
 
             NetServer = new NetServer(this.NetPeerConfig);
