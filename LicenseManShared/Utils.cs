@@ -36,19 +36,61 @@ namespace LicenseManShared
             }
         }
 
-        public static string GetCpuId()
+        public static string GetHWID()
         {
             ManagementClass cpuManager = new ManagementClass("win32_processor");
             ManagementObjectCollection cpuCollection = cpuManager.GetInstances();
 
             foreach (ManagementObject cpu in cpuCollection)
             {
-                return cpu.Properties["processorID"].Value.ToString();
+                var UniqueId = "";
+                var UniqueIdObj = cpu.Properties["UniqueId"].Value;
+                if(UniqueIdObj != null)
+                {
+                    UniqueId = UniqueIdObj.ToString();
+                }
+
+                var ProcessorId = "";
+                var ProcessorIdObj = cpu.Properties["ProcessorId"].Value.ToString();
+
+                if(ProcessorIdObj != null)
+                {
+                    ProcessorId = ProcessorIdObj.ToString();
+                }
+
+                var Name = "";
+                var NameObj = cpu.Properties["Name"].Value.ToString();
+                if(NameObj != null)
+                {
+                    Name = NameObj.ToString();
+
+                    int index = Name.IndexOf("Intel(R) Core(TM)");
+                    Name = (index < 0)
+                        ? Name
+                        : Name.Remove(index, "Intel(R) Core(TM)".Length);
+                }
+
+                var Manufacturer = "";
+                var ManufacturerObj = cpu.Properties["Manufacturer"].Value.ToString();
+                if(ManufacturerObj != null)
+                {
+                    Manufacturer = ManufacturerObj.ToString();
+                }
+
+                var MaxClockSpeed = "";
+                var MaxClockSpeedObj = cpu.Properties["MaxClockSpeed"].Value.ToString();
+                if(MaxClockSpeedObj != null)
+                {
+                    MaxClockSpeed = MaxClockSpeedObj.ToString();
+                }
+
+                var HWID = string.Format("{0}{1}{2}{3}{4}", UniqueId, ProcessorId, Manufacturer, MaxClockSpeed, Name);
+                return HWID.Substring(0, (HWID.Length > 64) ? 64 : HWID.Length); // only want 64 chars - man this sucks
             }
             
             throw new Exception("No CPU?!?");
         }
 
-        public static int ProtocolVersion = 2;
+        public static int ProtocolVersion = 3;
     }
 }

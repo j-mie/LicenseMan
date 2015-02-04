@@ -143,7 +143,7 @@ namespace LicenseManLoader
             NetOutgoingMessage msg = NetClient.CreateMessage();
             var username = Crypto.EncryptToString(ServerPublicKey, Username);
             var password = Crypto.EncryptToString(ServerPublicKey, Password);
-            var hwid = Crypto.EncryptToString(ServerPublicKey, Utils.GetCpuId());
+            var hwid = Crypto.EncryptToString(ServerPublicKey, Utils.GetHWID());
 
             msg.Write((byte)PacketHeaders.Headers.Login);
             msg.Write(Utils.ProtocolVersion);
